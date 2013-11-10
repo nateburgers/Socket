@@ -6,6 +6,8 @@ var app = express();
 var server = http.createServer(app)
 var io = require('socket.io').listen(server);
 
+var queue = []
+
 app.set('views', __dirname + "/views");
 app.set('view engine', 'jade');
 app.set('view options', {layout: false});
@@ -18,15 +20,22 @@ app.get("/", function(req, res) {
 server.listen(3000);
 
 io.sockets.on('connection', function(socket){
-    socket.on('setPsuedo', function(data) {
-	socket.set('psuedo', data);
-    });
 
-    socket.on('message', function(message) {
-	socket.get('psuedo', function(error, name) {
-	    var data = { 'message': message, psuedo : name };
-	    socket.broadcast.emit('message', data);
-	    console.log("user")
-	})
+    socket.emit("data", queue)
+
+    socket.on('putData', function(data){
+	queue = queue.concat(data)
+	socket.emit("data", queue)
     })
+
+    socket.on('getData', function(){
+	socket.emit("data", queue)
+    })
+
+    for(var i=0; i<100; i++){
+	socket.emit("data", {"x":Math.random(),
+			     "y":Math.random(),
+			     "z":Math.random()})
+    }
+
 })

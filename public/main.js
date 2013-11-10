@@ -1,6 +1,29 @@
+var group, program;
+
+function startSocket(){
+    console.log("started")
+    var socket = io.connect("http://localhost:3000")
+
+    socket.on("data", function(data){
+	    var material = new THREE.SpriteCanvasMaterial( {
+		color: Math.random() * 0x808008 + 0x808080,
+		program: program
+	    } );
+
+	console.log(data)
+
+	    particle = new THREE.Sprite( material );
+	    particle.position.x = data["x"] * 2000 - 1000
+	    particle.position.y = data["y"] * 2000 - 1000;
+	    particle.position.z = data["z"] * 2000 - 1000;
+	    particle.scale.x = particle.scale.y = Math.random() * 10 + 5;
+	    group.add( particle );
+    })
+}
+
 // function start() {
 	var container, stats;
-	var camera, scene, renderer, group, particle;
+	var camera, scene, renderer, particle;
 	var mouseX = 0, mouseY = 0;
 
 	var windowHalfX = window.innerWidth / 2;
@@ -22,10 +45,10 @@
 		scene = new THREE.Scene();
 
 		var PI2 = Math.PI * 2;
-		var program = function ( context ) {
+		program = function ( context ) {
 
 			context.beginPath();
-			context.arc( 0, 0, 1, 0, PI2, true );
+			context.arc( 0, 0, 3, 0, PI2, true );
 			context.fill();
 
 		}
@@ -33,23 +56,8 @@
 		group = new THREE.Object3D();
 		scene.add( group );
 
-		for ( var i = 0; i < 1000; i++ ) {
-
-			var material = new THREE.SpriteCanvasMaterial( {
-				color: Math.random() * 0x808008 + 0x808080,
-				program: program
-			} );
-
-			particle = new THREE.Sprite( material );
-			particle.position.x = Math.random() * 2000 - 1000;
-			particle.position.y = Math.random() * 2000 - 1000;
-			particle.position.z = Math.random() * 2000 - 1000;
-			particle.scale.x = particle.scale.y = Math.random() * 10 + 5;
-			group.add( particle );
-		}
-
 		renderer = new THREE.CanvasRenderer();
-		renderer.setSize( window.innerWidth, window.innerHeight );
+
 		container.appendChild( renderer.domElement );
 
 		document.addEventListener( 'mousemove', onDocumentMouseMove, false );
@@ -59,6 +67,8 @@
 		//
 
 		window.addEventListener( 'resize', onWindowResize, false );
+
+	    startSocket();
 
 	}
 
@@ -124,8 +134,8 @@
 		camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 		camera.lookAt( scene.position );
 
-		group.rotation.x += 0.01;
-		group.rotation.y += 0.02;
+		// group.rotation.x += 0.01;
+		// group.rotation.y += 0.02;
 
 		renderer.render( scene, camera );
 
