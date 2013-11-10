@@ -19,23 +19,33 @@ app.get("/", function(req, res) {
 });
 server.listen(3000);
 
-io.sockets.on('connection', function(socket){
+app.get('/post', function(req, res) {
+    io.sockets.emit('data', {'x': req.query.x, 'y': req.query.z, 'z': req.query.y})
+    res.send(200);
+});
 
-    socket.emit("data", queue)
-
-    socket.on('putData', function(data){
-	queue = queue.concat(data)
-	socket.emit("data", queue)
-    })
-
-    socket.on('getData', function(){
-	socket.emit("data", queue)
-    })
-
-    for(var i=0; i<100; i++){
-	socket.emit("data", {"x":Math.random(),
-			     "y":Math.random(),
-			     "z":Math.random()})
+app.get('/test', function(req, res) {
+    for(var i=0; i<10; i++){
+ io.sockets.emit("data", {"x":Math.random(),
+              "y":Math.random(),
+              "z":Math.random()})
     }
+res.send(200);
+});
 
-})
+// io.sockets.on('connection', function(socket){
+
+//     socket.emit("data", queue)
+
+//     socket.on('putData', function(data){
+//        queue = queue.concat(data)
+// 	   socket.emit("data", queue)
+//     })
+
+//     for(var i=0; i<100; i++){
+// 	socket.emit("data", {"x":Math.random(),
+// 			     "y":Math.random(),
+// 			     "z":Math.random()})
+//     }
+
+// })
