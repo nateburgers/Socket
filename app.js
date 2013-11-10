@@ -4,6 +4,7 @@ var http = require('http');
 var jade = require('jade');
 var app = express();
 var server = http.createServer(app)
+var io = require('socket.io').listen(server);
 
 app.set('views', __dirname + "/views");
 app.set('view engine', 'jade');
@@ -14,9 +15,8 @@ app.configure(function(){
 app.get("/", function(req, res) {
     res.render('index.jade')
 });
-app.listen(3000);
+server.listen(3000);
 
-var io = require('socket.io').listen(server);
 io.sockets.on('connection', function(socket){
     socket.on('setPsuedo', function(data) {
 	socket.set('psuedo', data);
